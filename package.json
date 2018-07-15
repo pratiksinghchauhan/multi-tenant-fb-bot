@@ -1,0 +1,15 @@
+{
+  "name": "ecsbot",
+  "version": "1.0.0",
+  "description": "a multitenant fb messenger bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "pratiksinghchauhan",
+  "license": "MIT",
+  "dependencies": {
+    "botmaster-messenger": "^1.2.0",
+    "request": "^2.87.0"
+  }
+}
