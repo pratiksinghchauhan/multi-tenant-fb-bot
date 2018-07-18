@@ -2,6 +2,7 @@ const Botmaster = require('botmaster');
 const MessengerBot = require('botmaster-messenger');
 const express = require('express');
 const http = require('http');
+var conversationLogs = require("./schema/conversation_logs")
 
 var app = express();
 var server =app.listen(process.env.PORT || '6000',function(){
@@ -28,6 +29,15 @@ botmaster.use({
   type: 'incoming',
   name: 'my-middleware',
   controller: (bot, update) => {
+
+    //async find message from senderid and pageid in the model
+
+    //if message found call the current flow or not found the restart
+
+    //save to the model 
+
+
+
     return bot.reply(update, 'Hello world!');
   }
 });

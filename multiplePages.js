@@ -1,12 +1,22 @@
 const Botmaster = require('botmaster');
 const MessengerBot = require('botmaster-messenger');
-
+var mongoose = require('mongoose');
 const express = require('express');
 
 var app = express();
+
+mongoose.connect(process.env.MONGO_URL);
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error to  db:'));
+db.once('open', function () {
+    console.log('Connected correctly to mongo server');
+});
+
+
 var server =app.listen(process.env.PORT || '6000',function(){
     console.log("listening on 6000");
 });
+
 const botmaster = new Botmaster({server});
 
 const messengerSettings = {
@@ -34,6 +44,23 @@ botmaster.use({
   name: 'my-middleware',
   controller: (bot, update) => {
 
+    conversation = await conversationLogs.find({sender_id:update.sender.id,page_id:update.recipient.id}.sort([['ts', -1]]));
+    console.log(conversation);
+
+    if(!conversation){
+      //show user the menu based on the page id
+    }
+
+    else if(conversation.currentFlow == "registration"){
+      //pass the bot to registration flow with step number and save to database at the end of each flow
+    }
+    else if(conversation.currentFlow == ""){
+
+    }
+    else{
+      //show user the choices
+    }
+    
     console.log(update.recipient.id);
     if(update.recipient.id == "2204397273123993")
       bot.reply(update, 'Hello World');
