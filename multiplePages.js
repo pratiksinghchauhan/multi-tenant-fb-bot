@@ -1,16 +1,17 @@
 const Botmaster = require('botmaster');
 const MessengerBot = require('botmaster-messenger');
-var mongoose = require('mongoose');
+// var mongoose = require('mongoose');
 const express = require('express');
+var unirest = require('unirest');
 
 var app = express();
 
-mongoose.connect(process.env.MONGO_URL);
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error to  db:'));
-db.once('open', function () {
-    console.log('Connected correctly to mongo server');
-});
+// mongoose.connect(process.env.MONGO_URL);
+// var db = mongoose.connection;
+// db.on('error', console.error.bind(console, 'connection error to  db:'));
+// db.once('open', function () {
+//     console.log('Connected correctly to mongo server');
+// });
 
 
 var server =app.listen(process.env.PORT || '6000',function(){
@@ -44,26 +45,61 @@ botmaster.use({
   name: 'my-middleware',
   controller: (bot, update) => {
 
-    conversation = await conversationLogs.find({sender_id:update.sender.id,page_id:update.recipient.id}.sort([['ts', -1]]));
-    console.log(conversation);
+    // conversation = await conversationLogs.find({sender_id:update.sender.id,page_id:update.recipient.id}.sort([['ts', -1]]));
+    // console.log(conversation);
 
-    if(!conversation){
-      //show user the menu based on the page id
-    }
+    // if(!conversation){
+    //   //show user the menu based on the page id
+    // }
 
-    else if(conversation.currentFlow == "registration"){
-      //pass the bot to registration flow with step number and save to database at the end of each flow
-    }
-    else if(conversation.currentFlow == ""){
+    // else if(conversation.currentFlow == "registration"){
+    //   //pass the bot to registration flow with step number and save to database at the end of each flow
+    // }
+    // else if(conversation.currentFlow == ""){
 
-    }
-    else{
-      //show user the choices
-    }
+    // }
+    // else{
+    //   //show user the choices
+    // }
     
-    console.log(update.recipient.id);
-    if(update.recipient.id == "2204397273123993")
-      bot.reply(update, 'Hello World');
+        console.log(update.recipient.id);
+        if(update.recipient.id == "2204397273123993"){
+          console.log(update)
+          console.log(update.message)
+            var original_question= update.message.text.replace("/","");
+            console.log(update.message.text);
+            unirest.get("http://45.76.57.36:7500/question/5b07b89235c20a13e4fd0d09/" + original_question).headers({
+                'Content-type': 'application/json'
+            }).end(function (res) {
+                console.log(res.body); 
+                if (res.error) {
+                    console.log('GET error', res.error)
+                    console.log('Go to begin Dialog Cont');
+                    bot.reply(update, 'faq Server issue');
+                    //bot.reply(update, 'Hello World');
+                    return 3;
+                }
+                else if(res.body.response_list && res.body.response_list.length > 0){
+                  console.log("Got responses from faq bot");
+                  var answer2 = {};
+                  var answer3 = {};
+                  var answer1 = res.body.response_list[0];
+                
+                  if(res.body.response_list.length>1)answer2 = res.body.response_list[1];
+                  if(res.body.response_list.length>2)answer3 = res.body.response_list[2];
+                  console.log("confidenceeeeee-"+answer1.confidence);
+                  if (answer1.confidence){//} > 0.5) {
+                      var ans =  answer1.answer.replace(/\r?\n|\r/g, " ");
+                      bot.reply(update, ans);
+                      console.log(answer1);
+                  }
+              }
+              else{
+                  bot.reply(update, "FAQ NOT FOUND");
+                }
+            });
+        }
+          
     else if(update.recipient.id == "414633025706991")
       bot.reply(update,"hey there");
     else
