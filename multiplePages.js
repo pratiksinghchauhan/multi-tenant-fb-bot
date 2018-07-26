@@ -68,7 +68,7 @@ botmaster.use({
           console.log(update.message)
             var original_question= update.message.text.replace("/","");
             console.log(update.message.text);
-            unirest.get("http://45.76.57.36:7500/question/5b07b89235c20a13e4fd0d09/" + original_question).headers({
+            unirest.get("http://45.76.57.36:7500/question/5adeeb4ec3d41e2598606ece/" + original_question).headers({
                 'Content-type': 'application/json'
             }).end(function (res) {
                 console.log(res.body); 
@@ -100,8 +100,43 @@ botmaster.use({
             });
         }
           
-    else if(update.recipient.id == "414633025706991")
-      bot.reply(update,"hey there");
+    else if(update.recipient.id == "414633025706991"){
+      console.log(update)
+          console.log(update.message)
+            var original_question= update.message.text.replace("/","");
+            console.log(update.message.text);
+            unirest.get("http://45.76.57.36:7500/question/5aae9c5d1d18d519a8e27bd2/" + original_question).headers({
+                'Content-type': 'application/json'
+            }).end(function (res) {
+                console.log(res.body); 
+                if (res.error) {
+                    console.log('GET error', res.error)
+                    console.log('Go to begin Dialog Cont');
+                    bot.reply(update, 'faq Server issue');
+                    //bot.reply(update, 'Hello World');
+                    return 3;
+                }
+                else if(res.body.response_list && res.body.response_list.length > 0){
+                  console.log("Got responses from faq bot");
+                  var answer2 = {};
+                  var answer3 = {};
+                  var answer1 = res.body.response_list[0];
+                
+                  if(res.body.response_list.length>1)answer2 = res.body.response_list[1];
+                  if(res.body.response_list.length>2)answer3 = res.body.response_list[2];
+                  console.log("confidenceeeeee-"+answer1.confidence);
+                  if (answer1.confidence){//} > 0.5) {
+                      var ans =  answer1.answer.replace(/\r?\n|\r/g, " ");
+                      bot.reply(update, ans);
+                      console.log(answer1);
+                  }
+              }
+              else{
+                  bot.reply(update, "FAQ NOT FOUND");
+                }
+            });
+    }
+      // bot.reply(update,"hey there");
     else
       bot.reply("hey hey");
     
